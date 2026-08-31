@@ -1,0 +1,45 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/schema.json",
+  "productName": "VibeNotes",
+  "version": "0.1.0",
+  "identifier": "com.vibenotes.app",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devUrl": "http://localhost:5173",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "VibeNotes Hub",
+        "label": "notes-hub",
+        "url": "index.html#/hub",
+        "width": 820,
+        "height": 620,
+        "minWidth": 420,
+        "minHeight": 450,
+        "resizable": true,
+        "decorations": false,
+        "visible": false,
+        "shadow": true,
+        "transparent": false
+      }
+    ],
+    "security": {
+      "csp": null,
+      "capabilities": ["default"]
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico",
+      "icons/icon.png"
+    ]
+  }
+}
