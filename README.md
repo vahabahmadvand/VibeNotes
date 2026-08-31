@@ -56,7 +56,7 @@ Make sure you have the following installed on Windows:
 
 ```bash
 # Clone repository
-git clone https://github.com/YOUR_USERNAME/VibeNotes.git
+git clone https://github.com/vahabahmadvand/VibeNotes.git
 cd VibeNotes
 
 # Install frontend dependencies
