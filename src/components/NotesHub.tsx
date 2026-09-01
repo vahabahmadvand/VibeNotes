@@ -13,9 +13,11 @@ import {
   LayoutGrid,
   Eye,
   EyeOff,
+  Sparkles,
 } from 'lucide-react';
 import type { Note } from '../types';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
+import { UpdateModal } from './UpdateModal';
 
 const COLOR_FILTERS: { id: string; name: string; bg: string }[] = [
   { id: 'all', name: 'All Colors', bg: '#94a3b8' },
@@ -37,6 +39,7 @@ export const NotesHub: React.FC = () => {
   const [iconSize, setIconSize] = useState<'small' | 'medium' | 'large'>('medium');
   const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
 
   // Load notes & autostart status
   const fetchNotes = async () => {
@@ -181,6 +184,13 @@ export const NotesHub: React.FC = () => {
             V
           </div>
           <span className="font-semibold text-xs tracking-wide">VibeNotes Hub</span>
+          <button
+            onClick={() => setShowUpdateModal(true)}
+            className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors cursor-pointer"
+            title="Check for updates"
+          >
+            v0.2.0
+          </button>
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -245,6 +255,16 @@ export const NotesHub: React.FC = () => {
             >
               <EyeOff size={13} />
               <span>Hide All</span>
+            </button>
+
+            {/* Check For Updates button */}
+            <button
+              onClick={() => setShowUpdateModal(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+              title="Check for updates from GitHub"
+            >
+              <Sparkles size={13} className="text-amber-500" />
+              <span>Updates</span>
             </button>
 
             {/* Windows Startup Option */}
@@ -435,6 +455,12 @@ export const NotesHub: React.FC = () => {
         noteTitle={noteToDelete?.title || ''}
         onConfirm={handleConfirmDelete}
         onCancel={() => setNoteToDelete(null)}
+      />
+
+      {/* App Update Modal */}
+      <UpdateModal
+        isOpen={showUpdateModal}
+        onClose={() => setShowUpdateModal(false)}
       />
     </div>
   );

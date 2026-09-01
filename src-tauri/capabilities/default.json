@@ -63,6 +63,8 @@
     "core:webview:allow-set-webview-focus",
     "core:webview:allow-set-webview-zoom",
     "core:webview:allow-print",
-    "core:webview:allow-internal-toggle-devtools"
+    "core:webview:allow-internal-toggle-devtools",
+    "updater:default",
+    "process:default"
   ]
 }
