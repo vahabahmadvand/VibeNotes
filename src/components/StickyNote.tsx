@@ -28,6 +28,7 @@ import { CodeBlockView } from './CodeBlockView';
 import { ThemePicker } from './ThemePicker';
 import { FormatToolbar } from './FormatToolbar';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
+import { TableEditorOverlay } from './TableEditorOverlay';
 
 const lowlight = createLowlight(all);
 
@@ -45,6 +46,7 @@ export const StickyNote: React.FC<StickyNoteProps> = ({ noteId }) => {
 
   const appWindow = getCurrentWindow();
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const editorContainerRef = useRef<HTMLDivElement | null>(null);
 
   // Load Note from SQLite
   useEffect(() => {
@@ -133,7 +135,7 @@ export const StickyNote: React.FC<StickyNoteProps> = ({ noteId }) => {
       content: note?.content_json ? JSON.parse(note.content_json) : '<p></p>',
       editorProps: {
         attributes: {
-          class: 'outline-none h-full px-3.5 py-2 overflow-y-auto',
+          class: 'outline-none min-h-full px-3.5 py-2',
         },
         handleDOMEvents: {
           drop: (view, event) => {
@@ -317,8 +319,9 @@ export const StickyNote: React.FC<StickyNoteProps> = ({ noteId }) => {
       </div>
 
       {/* Main ProseMirror Editor Canvas */}
-      <div className="flex-1 overflow-hidden">
-        <EditorContent editor={editor} className="h-full" />
+      <div ref={editorContainerRef} className="flex-1 overflow-y-auto relative">
+        <EditorContent editor={editor} className="min-h-full" />
+        <TableEditorOverlay editor={editor} containerRef={editorContainerRef} />
       </div>
 
       {/* Bottom Format Toolbar */}

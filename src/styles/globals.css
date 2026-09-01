@@ -226,24 +226,56 @@ ul[data-type="taskList"] li[data-checked="true"] > div > p {
 /* Tables */
 .ProseMirror table {
   border-collapse: collapse;
-  margin: 0.6rem 0;
+  margin: 0.8rem 0;
   width: 100%;
   table-layout: fixed;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .ProseMirror table td,
 .ProseMirror table th {
   border: 1px solid var(--note-border);
-  padding: 0.4rem 0.6rem;
+  padding: 0.45rem 0.6rem;
   vertical-align: top;
   box-sizing: border-box;
+  position: relative;
   font-size: 13.5px;
+  min-width: 1.5em;
 }
 
 .ProseMirror table th {
-  font-weight: bold;
-  background-color: rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.theme-charcoal .ProseMirror table th {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.ProseMirror table .selectedCell:after {
+  z-index: 2;
+  position: absolute;
+  content: "";
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(59, 130, 246, 0.14);
+  pointer-events: none;
+}
+
+.ProseMirror table .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: -2px;
+  width: 4px;
+  background-color: #3b82f6;
+  pointer-events: none;
+}
+
+.ProseMirror.resize-cursor {
+  cursor: col-resize;
 }
 
 /* Custom Scrollbars */
