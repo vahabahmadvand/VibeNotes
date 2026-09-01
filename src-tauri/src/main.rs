@@ -25,6 +25,12 @@ fn is_single_instance() -> bool {
 }
 
 fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    if args.iter().any(|arg| arg == "--mcp") {
+        vibenotes_lib::mcp::run_mcp_server();
+        return;
+    }
+
     #[cfg(windows)]
     if !is_single_instance() {
         // Another instance is already running, exit immediately

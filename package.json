@@ -1,14 +1,17 @@
 {
   "name": "vibenotes",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "tauri": "tauri",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "mcp:build": "npm --prefix mcp-server run build",
+    "mcp:start": "node mcp-server/dist/index.js",
+    "mcp:test": "npm --prefix mcp-server test"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.11.1",

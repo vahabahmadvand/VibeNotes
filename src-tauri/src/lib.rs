@@ -1,6 +1,7 @@
 pub mod autostart;
 pub mod commands;
 pub mod db;
+pub mod mcp;
 pub mod models;
 pub mod tray;
 
