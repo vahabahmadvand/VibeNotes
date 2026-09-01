@@ -273,72 +273,80 @@ ul[data-type="taskList"] li[data-checked="true"] > div > p {
   background: rgba(255, 255, 255, 0.45);
 }
 
-/* Highlight.js VS Code Dark+ Syntax Tokens */
-.hljs {
-  color: #d4d4d4;
-  background: #1e1e1e;
-}
-
+/* Code Block Styling - High Contrast on ALL Note Themes */
 .code-block-wrapper {
   direction: ltr;
   text-align: left;
+  color: #f8fafc !important;
+  background-color: #1e1e1e !important;
 }
 
+.code-block-wrapper pre,
+.code-block-wrapper [data-node-view-content],
+.code-block-wrapper code,
+.code-block-wrapper .hljs {
+  color: #f8fafc !important;
+  background-color: #1e1e1e !important;
+  font-family: Consolas, Monaco, "Courier New", Courier, monospace;
+}
+
+/* Highlight.js VS Code Dark+ Vivid Syntax Tokens */
 .hljs-keyword,
 .hljs-operator {
-  color: #569cd6;
+  color: #569cd6 !important;
+  font-weight: 500;
 }
 
 .hljs-string,
 .hljs-meta .hljs-string {
-  color: #ce9178;
+  color: #ce9178 !important;
 }
 
 .hljs-comment,
 .hljs-quote {
-  color: #6a9955;
+  color: #6a9955 !important;
   font-style: italic;
 }
 
 .hljs-number,
 .hljs-literal {
-  color: #b5cea8;
+  color: #b5cea8 !important;
 }
 
 .hljs-title,
 .hljs-title.hljs-function,
 .hljs-title.hljs-class {
-  color: #dcdcaa;
+  color: #dcdcaa !important;
 }
 
 .hljs-params {
-  color: #9cdcfe;
+  color: #9cdcfe !important;
 }
 
 .hljs-type,
 .hljs-class {
-  color: #4ec9b0;
+  color: #4ec9b0 !important;
 }
 
 .hljs-attribute,
 .hljs-attr {
-  color: #9cdcfe;
+  color: #9cdcfe !important;
 }
 
 .hljs-built_in,
 .hljs-symbol {
-  color: #4ec9b0;
+  color: #4ec9b0 !important;
 }
 
 .hljs-variable,
 .hljs-template-variable {
-  color: #9cdcfe;
+  color: #9cdcfe !important;
 }
 
 .hljs-tag {
-  color: #569cd6;
+  color: #569cd6 !important;
 }
 
 .hljs-name {
-  color: #569cd6;
+  color: #569cd6 !important;
 }

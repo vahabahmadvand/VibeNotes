@@ -39,9 +39,9 @@ export const CodeBlockView: React.FC<any> = ({ node, updateAttributes }) => {
   };
 
   return (
-    <NodeViewWrapper className="code-block-wrapper relative my-3 rounded-lg overflow-hidden border border-zinc-700/80 bg-[#1e1e1e] shadow-md text-xs font-mono select-none">
+    <NodeViewWrapper className="code-block-wrapper relative my-3 rounded-lg overflow-hidden border border-zinc-700/80 bg-[#1e1e1e] text-[#f8fafc] shadow-md text-xs font-mono select-none">
       {/* Code Header Bar */}
-      <div className="flex items-center justify-between px-2.5 py-1.5 bg-[#252526] border-b border-zinc-700/60 select-none">
+      <div className="flex items-center justify-between px-2.5 py-1.5 bg-[#252526] border-b border-zinc-700/60 select-none text-zinc-300">
         <div className="flex items-center gap-1.5">
           {/* Collapse/Expand Chevron */}
           <button
@@ -125,7 +125,7 @@ export const CodeBlockView: React.FC<any> = ({ node, updateAttributes }) => {
           <span className="text-[10px] text-zinc-400 underline">Show</span>
         </div>
       ) : (
-        <pre className="p-3 overflow-x-auto text-[13px] leading-relaxed font-mono select-text bg-[#1e1e1e] max-h-[380px] overflow-y-auto">
+        <pre className="p-3 overflow-x-auto text-[13px] leading-relaxed font-mono select-text bg-[#1e1e1e] text-[#f8fafc] max-h-[380px] overflow-y-auto">
           <NodeViewContent as="div" className={`language-${currentLang}`} />
         </pre>
       )}
