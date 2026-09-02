@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
+import { getVersion } from '@tauri-apps/api/app';
 import {
   Search,
   Plus,
@@ -40,6 +41,7 @@ export const NotesHub: React.FC = () => {
   const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
   const [loading, setLoading] = useState(true);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [appVersion, setAppVersion] = useState<string>('');
 
   // Load notes & autostart status
   const fetchNotes = async () => {
@@ -59,6 +61,7 @@ export const NotesHub: React.FC = () => {
   };
 
   useEffect(() => {
+    getVersion().then(setAppVersion).catch(() => setAppVersion('0.3.2'));
     fetchNotes();
     const interval = setInterval(fetchNotes, 2500);
     return () => clearInterval(interval);
@@ -189,7 +192,7 @@ export const NotesHub: React.FC = () => {
             className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors cursor-pointer"
             title="Check for updates"
           >
-            v0.2.0
+            v{appVersion || '0.3.2'}
           </button>
         </div>
 

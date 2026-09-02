@@ -46,7 +46,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
       const ver = await getVersion();
       setCurrentVersion(ver);
     } catch {
-      setCurrentVersion('0.2.0');
+      setCurrentVersion('0.3.2');
     }
   };
 
@@ -146,7 +146,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
             <div>
               <h3 className="font-semibold text-sm">VibeNotes Updates</h3>
               <p className="text-[11px] text-slate-500 dark:text-zinc-400">
-                Current Version: <span className="font-mono font-medium">v{currentVersion || '0.2.0'}</span>
+                Current Version: <span className="font-mono font-medium">v{currentVersion || '0.3.2'}</span>
               </p>
             </div>
           </div>

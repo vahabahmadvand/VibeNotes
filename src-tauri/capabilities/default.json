@@ -65,6 +65,8 @@
     "core:webview:allow-print",
     "core:webview:allow-internal-toggle-devtools",
     "updater:default",
-    "process:default"
+    "process:default",
+    "core:app:default",
+    "core:app:allow-version"
   ]
 }
