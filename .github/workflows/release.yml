@@ -41,11 +41,25 @@ jobs:
       - name: Install Frontend Dependencies
         run: npm ci
 
+      - name: Prepare Signing Key
+        shell: pwsh
+        run: |
+          $rawKey = @"
+          ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          "@
+          $cleanKey = $rawKey.Trim().Trim('"').Trim("'")
+          while ($cleanKey.Length % 4 -ne 0) { $cleanKey += "=" }
+          $keyPath = "$env:RUNNER_TEMP\vibenotes.key"
+          Set-Content -Path $keyPath -Value $cleanKey -NoNewline
+          "TAURI_SIGNING_PRIVATE_KEY=$cleanKey" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "TAURI_SIGNING_PRIVATE_KEY_PATH=$keyPath" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
       - name: Build and Publish Tauri App
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PATH: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PATH }}
           TAURI_SIGNING_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_KEY_PASSWORD }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_KEY_PASSWORD }}
         with:

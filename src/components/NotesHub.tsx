@@ -61,7 +61,7 @@ export const NotesHub: React.FC = () => {
   };
 
   useEffect(() => {
-    getVersion().then(setAppVersion).catch(() => setAppVersion('0.3.2'));
+    getVersion().then(setAppVersion).catch(() => setAppVersion('0.3.3'));
     fetchNotes();
     const interval = setInterval(fetchNotes, 2500);
     return () => clearInterval(interval);
@@ -192,7 +192,7 @@ export const NotesHub: React.FC = () => {
             className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors cursor-pointer"
             title="Check for updates"
           >
-            v{appVersion || '0.3.2'}
+            v{appVersion || '0.3.3'}
           </button>
         </div>
 
