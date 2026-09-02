@@ -22,6 +22,13 @@ Search notes, filter by color, toggle card sizes, and manage your entire workspa
 
 ---
 
+### 🔄 Seamless In-App Updates
+Check for GitHub releases, view changelogs, download signed updates, and restart with one click:
+
+![VibeNotes Auto-Update](docs/screenshots/auto-update-preview.png)
+
+---
+
 ## ✨ Features
 
 - 🪟 **Floating Frameless Sticky Notes:** Custom drag regions, real-time coordinate & size persistence, and per-note "Always on Top" pin.
@@ -34,6 +41,7 @@ Search notes, filter by color, toggle card sizes, and manage your entire workspa
   - Interactive checklists with nested task lists (`Tab` / `Shift+Tab`).
   - Tables, blockquotes, links, and drag-and-drop image support.
 - 🗄️ **Central Notes Hub:** Search, filter by color, archive, or permanently delete notes, with a toggleable card size view (*Small, Medium, Large*).
+- 🔄 **In-App Auto-Updates:** Seamless GitHub Releases integration with Tauri v2 updater. Checks for new releases, displays changelogs, validates cryptographic signatures, downloads in background, and relaunches smoothly.
 - 🔒 **Single Instance Protection:** Native Windows Kernel Mutex ensures only one instance runs at a time.
 - 🤖 **Model Context Protocol (MCP) Server:** Manage your sticky notes with any AI agent (Antigravity, Claude Desktop, Cursor, Claude Code, Cline) with full support for tables, code blocks, checklists, and themes!
 - 💾 **SQLite Storage:** Crash-resilient local database with Write-Ahead Logging (WAL) stored in `%APPDATA%/VibeNotes/vibenotes.db`.
@@ -210,11 +218,13 @@ VibeNotes/
 ├── docs/                      # Screenshots & assets for README
 │   └── screenshots/
 │       ├── sticky-notes-preview.png
-│       └── notes-hub-preview.png
+│       ├── notes-hub-preview.png
+│       └── auto-update-preview.png
 ├── src/                       # React 19 Frontend
 │   ├── components/
 │   │   ├── StickyNote.tsx     # Floating frameless sticky note window
 │   │   ├── NotesHub.tsx       # Central searchable notes manager
+│   │   ├── UpdateModal.tsx    # In-app update & changelog dialog
 │   │   ├── CodeBlockView.tsx  # Syntax-highlighted code block with collapse/expand
 │   │   ├── FormatToolbar.tsx  # WYSIWYG markdown formatting bar
 │   │   ├── ThemePicker.tsx    # 7-color palette switcher

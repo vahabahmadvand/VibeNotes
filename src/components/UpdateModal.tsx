@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { invoke } from '@tauri-apps/api/core';
 import { check, Update } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { getVersion } from '@tauri-apps/api/app';
@@ -46,7 +47,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
       const ver = await getVersion();
       setCurrentVersion(ver);
     } catch {
-      setCurrentVersion('0.3.3');
+      setCurrentVersion('0.3.4');
     }
   };
 
@@ -132,6 +133,12 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
     return `${mb.toFixed(1)} MB`;
   };
 
+  const handleOpenReleases = () => {
+    invoke('open_external_url', {
+      url: 'https://github.com/vahabahmadvand/VibeNotes/releases',
+    }).catch((err) => console.error('Failed to open external url:', err));
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -146,7 +153,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
             <div>
               <h3 className="font-semibold text-sm">VibeNotes Updates</h3>
               <p className="text-[11px] text-slate-500 dark:text-zinc-400">
-                Current Version: <span className="font-mono font-medium">v{currentVersion || '0.3.3'}</span>
+                Current Version: <span className="font-mono font-medium">v{currentVersion || '0.3.4'}</span>
               </p>
             </div>
           </div>
@@ -264,30 +271,26 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
                 </div>
               </div>
 
-              <a
-                href="https://github.com/vahabahmadvand/VibeNotes/releases"
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center justify-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 hover:underline pt-1"
+              <button
+                onClick={handleOpenReleases}
+                className="flex items-center justify-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 hover:underline pt-1 cursor-pointer"
               >
                 <span>View releases manually on GitHub</span>
                 <ExternalLink size={12} />
-              </a>
+              </button>
             </div>
           )}
         </div>
 
         {/* Modal Footer Actions */}
         <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-zinc-800">
-          <a
-            href="https://github.com/vahabahmadvand/VibeNotes/releases"
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-zinc-500 hover:text-slate-700 dark:hover:text-zinc-300 transition-colors"
+          <button
+            onClick={handleOpenReleases}
+            className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-zinc-500 hover:text-slate-700 dark:hover:text-zinc-300 transition-colors cursor-pointer"
           >
             <span>GitHub Releases</span>
             <ExternalLink size={11} />
-          </a>
+          </button>
 
           <div className="flex items-center gap-2">
             {status === 'available' && (

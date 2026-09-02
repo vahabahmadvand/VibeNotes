@@ -42,6 +42,7 @@ pub fn run() {
             commands::close_hub_window,
             commands::get_autostart_status,
             commands::toggle_autostart,
+            commands::open_external_url,
         ])
         .setup(move |app| {
             let app_handle = app.handle().clone();

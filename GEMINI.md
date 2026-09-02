@@ -46,8 +46,10 @@ In `src-tauri/capabilities/default.json`, ensure the following permissions remai
 - `"updater:default"`
 - `"process:default"`
 
-### 4. Build Verification (Optional Local Sanity Check)
-```bash
+### 4. Build Verification & File Lock Prevention
+Before building or verifying locally, ensure no running instance of `vibenotes.exe` is active (e.g. running in background or system tray), as Windows locks executable files with `Access is denied (os error 5)`:
+```powershell
+Stop-Process -Name "vibenotes" -Force -ErrorAction SilentlyContinue
 npm run build
 cargo check --manifest-path src-tauri/Cargo.toml
 ```
@@ -62,7 +64,15 @@ git push origin master --tags
 
 ### 6. Automated GitHub Actions
 Pushing the `v*` tag triggers `.github/workflows/release.yml`, which:
-1. Builds the Windows binaries (`.exe`, `.msi`).
-2. Signs the update package using `TAURI_SIGNING_PRIVATE_KEY` and `TAURI_SIGNING_KEY_PASSWORD`.
-3. Generates `latest.json` containing the new version manifest.
-4. Publishes all assets directly to the GitHub Release.
+1. Prepares and sanitizes the signing key (strips whitespace/quotes and ensures valid base64 padding).
+2. Builds the Windows binaries (`.exe`, `.msi`).
+3. Signs the update package using `TAURI_SIGNING_PRIVATE_KEY` and `TAURI_SIGNING_KEY_PASSWORD`.
+4. Generates `latest.json` containing the new version manifest.
+5. Publishes all assets directly to the GitHub Release.
+
+### 7. Troubleshooting & Key Invariants
+- **Base64 Signing Key Padding (`Invalid padding`)**:
+  - `TAURI_SIGNING_PRIVATE_KEY` must be a valid Base64 string whose length is a multiple of 4.
+  - The `.github/workflows/release.yml` workflow includes a `Prepare Signing Key` step that automatically strips quotes/whitespace and appends any missing `=` padding characters.
+- **Frontend Version Display Invariant**:
+  - Never hardcode version strings (e.g. `v0.2.0`) in React components. Always use `getVersion()` from `@tauri-apps/api/app` backed by `"core:app:allow-version"` permissions in `src-tauri/capabilities/default.json`.

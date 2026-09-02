@@ -256,3 +256,23 @@ pub fn spawn_or_focus_note_window(app: &AppHandle, note: &Note) -> Result<(), St
 
     Ok(())
 }
+
+#[tauri::command]
+pub async fn open_external_url(url: String) -> Result<(), String> {
+    #[cfg(target_os = "windows")]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        std::process::Command::new("rundll32")
+            .args(["url.dll,FileProtocolHandler", &url])
+            .creation_flags(CREATE_NO_WINDOW)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        let _ = url;
+    }
+    Ok(())
+}
+

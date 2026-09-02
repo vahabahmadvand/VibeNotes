@@ -1,6 +1,6 @@
 [package]
 name = "vibenotes"
-version = "0.3.3"
+version = "0.3.4"
 description = "VibeNotes - Lightweight Windows Sticky Notes with Markdown and Code Blocks"
 authors = ["VibeNotes Team"]
 edition = "2021"
