@@ -9,6 +9,7 @@
     "tauri": "tauri",
     "lint": "oxlint",
     "preview": "vite preview",
+    "bump": "node scripts/bump-version.mjs",
     "mcp:build": "npm --prefix mcp-server run build",
     "mcp:start": "node mcp-server/dist/index.js",
     "mcp:test": "npm --prefix mcp-server test"

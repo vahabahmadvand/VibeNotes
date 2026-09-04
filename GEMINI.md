@@ -8,25 +8,26 @@ This document outlines standard procedures for maintaining and releasing new ver
 
 When releasing a new version of VibeNotes (e.g., `v0.3.3`), follow this strict workflow to ensure the Tauri v2 in-app auto-updater and GitHub Actions release pipelines succeed:
 
-### 1. Synchronize Version Numbers Across All 3 Files
-The version must be identical in all three locations:
+### 1. Synchronize Version Numbers (Automated)
+Run the automated bump command to update all configuration and lock files simultaneously (`package.json`, `package-lock.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, and `src-tauri/Cargo.lock`):
 
-- **`package.json`**:
-  ```json
-  "version": "X.Y.Z"
-  ```
-- **`src-tauri/tauri.conf.json`**:
-  ```json
-  "version": "X.Y.Z"
-  ```
-- **`src-tauri/Cargo.toml`**:
-  ```toml
-  version = "X.Y.Z"
-  ```
+```powershell
+# Bump patch (e.g. 0.3.5 -> 0.3.6)
+npm run bump patch
+
+# OR bump minor (e.g. 0.3.5 -> 0.4.0)
+npm run bump minor
+
+# OR specify an exact version:
+npm run bump 0.3.6
+```
+
+> [!NOTE]
+> Frontend components (`NotesHub.tsx`, `UpdateModal.tsx`) use `__APP_VERSION__` dynamically injected by Vite at build time and `getVersion()` at runtime. They **never** require manual version editing.
 
 > [!CRITICAL]
 > **Git Tag Must Match `tauri.conf.json` Version Exactly**:
-> `tauri-action` will fail the CI/CD build if the Git tag (e.g. `v0.3.3`) does not match the version defined in `tauri.conf.json` (`0.3.3`).
+> `tauri-action` will fail the CI/CD build if the Git tag (e.g. `v0.3.6`) does not match the version defined in `tauri.conf.json` (`0.3.6`).
 
 ### 2. Verify Updater Configuration
 Ensure `src-tauri/tauri.conf.json` retains:
@@ -76,3 +77,5 @@ Pushing the `v*` tag triggers `.github/workflows/release.yml`, which:
   - The `.github/workflows/release.yml` workflow includes a `Prepare Signing Key` step that automatically strips quotes/whitespace and appends any missing `=` padding characters.
 - **Frontend Version Display Invariant**:
   - Never hardcode version strings (e.g. `v0.2.0`) in React components. Always use `getVersion()` from `@tauri-apps/api/app` backed by `"core:app:allow-version"` permissions in `src-tauri/capabilities/default.json`.
+- **Tauri Custom Protocol Feature**:
+  - In `src-tauri/Cargo.toml`, ensure `[features]` retains `default = ["custom-protocol"]` and `custom-protocol = ["tauri/custom-protocol"]`. Without this feature, Tauri treats builds as development mode and navigates to `localhost:5173`, resulting in `localhost refused to connect` errors when running standalone.

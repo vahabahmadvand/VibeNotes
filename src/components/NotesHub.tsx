@@ -61,7 +61,7 @@ export const NotesHub: React.FC = () => {
   };
 
   useEffect(() => {
-    getVersion().then(setAppVersion).catch(() => setAppVersion('0.3.4'));
+    getVersion().then(setAppVersion).catch(() => setAppVersion(__APP_VERSION__));
     fetchNotes();
     const interval = setInterval(fetchNotes, 2500);
     return () => clearInterval(interval);
