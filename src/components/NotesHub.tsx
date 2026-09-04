@@ -1,24 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { getVersion } from '@tauri-apps/api/app';
+import { check } from '@tauri-apps/plugin-updater';
 import {
   Search,
   Plus,
   Pin,
   Trash2,
   ExternalLink,
-  Power,
   X,
   Archive,
   ArchiveRestore,
   LayoutGrid,
   Eye,
   EyeOff,
-  Sparkles,
+  Settings,
 } from 'lucide-react';
 import type { Note } from '../types';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { UpdateModal } from './UpdateModal';
+import { SettingsModal } from './SettingsModal';
 
 const COLOR_FILTERS: { id: string; name: string; bg: string }[] = [
   { id: 'all', name: 'All Colors', bg: '#94a3b8' },
@@ -41,7 +42,21 @@ export const NotesHub: React.FC = () => {
   const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
   const [loading, setLoading] = useState(true);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [hasUpdateAvailable, setHasUpdateAvailable] = useState(false);
+  const [autoCheckUpdates, setAutoCheckUpdates] = useState<boolean>(() => {
+    const saved = localStorage.getItem('vibenotes_auto_check_updates');
+    return saved !== null ? saved === 'true' : true;
+  });
   const [appVersion, setAppVersion] = useState<string>('');
+
+  const handleToggleAutoCheckUpdates = () => {
+    setAutoCheckUpdates((prev) => {
+      const next = !prev;
+      localStorage.setItem('vibenotes_auto_check_updates', String(next));
+      return next;
+    });
+  };
 
   // Load notes & autostart status
   const fetchNotes = async () => {
@@ -64,7 +79,29 @@ export const NotesHub: React.FC = () => {
     getVersion().then(setAppVersion).catch(() => setAppVersion(__APP_VERSION__));
     fetchNotes();
     const interval = setInterval(fetchNotes, 2500);
-    return () => clearInterval(interval);
+
+    // Auto-check for updates 3 seconds after startup
+    let updateTimeout: ReturnType<typeof setTimeout> | null = null;
+    const shouldCheck = localStorage.getItem('vibenotes_auto_check_updates') !== 'false';
+    if (shouldCheck) {
+      updateTimeout = setTimeout(async () => {
+        try {
+          const update = await check();
+          if (update?.available) {
+            setHasUpdateAvailable(true);
+            await invoke('open_hub_window');
+            setShowUpdateModal(true);
+          }
+        } catch (err) {
+          console.debug('Startup update check skipped or failed:', err);
+        }
+      }, 3000);
+    }
+
+    return () => {
+      clearInterval(interval);
+      if (updateTimeout) clearTimeout(updateTimeout);
+    };
   }, []);
 
   const handleToggleAutostart = async () => {
@@ -192,11 +229,21 @@ export const NotesHub: React.FC = () => {
             className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors cursor-pointer"
             title="Check for updates"
           >
-            v{appVersion || '0.3.4'}
+            v{appVersion || __APP_VERSION__}
           </button>
         </div>
 
         <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => setShowSettingsModal(true)}
+            className="relative w-6 h-6 flex items-center justify-center rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+            title="Settings"
+          >
+            <Settings size={14} />
+            {hasUpdateAvailable && (
+              <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-amber-500 ring-2 ring-white dark:ring-slate-900" />
+            )}
+          </button>
           <button
             onClick={handleCloseHub}
             className="w-6 h-6 flex items-center justify-center rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
@@ -260,28 +307,18 @@ export const NotesHub: React.FC = () => {
               <span>Hide All</span>
             </button>
 
-            {/* Check For Updates button */}
-            <button
-              onClick={() => setShowUpdateModal(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
-              title="Check for updates from GitHub"
-            >
-              <Sparkles size={13} className="text-amber-500" />
-              <span>Updates</span>
-            </button>
 
-            {/* Windows Startup Option */}
+            {/* Settings button */}
             <button
-              onClick={handleToggleAutostart}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors cursor-pointer ${
-                autostartEnabled
-                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300'
-                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
-              }`}
-              title="Launch VibeNotes when Windows boots"
+              onClick={() => setShowSettingsModal(true)}
+              className="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+              title="Application Settings"
             >
-              <Power size={13} className={autostartEnabled ? 'text-emerald-600' : 'text-slate-400'} />
-              <span>Startup: {autostartEnabled ? 'On' : 'Off'}</span>
+              <Settings size={13} className="text-slate-500 dark:text-slate-400" />
+              <span>Settings</span>
+              {hasUpdateAvailable && (
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+              )}
             </button>
 
             {/* Icon Size Toggle right next to Startup Option */}
@@ -464,6 +501,19 @@ export const NotesHub: React.FC = () => {
       <UpdateModal
         isOpen={showUpdateModal}
         onClose={() => setShowUpdateModal(false)}
+      />
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={showSettingsModal}
+        onClose={() => setShowSettingsModal(false)}
+        autostartEnabled={autostartEnabled}
+        onToggleAutostart={handleToggleAutostart}
+        autoCheckUpdates={autoCheckUpdates}
+        onToggleAutoCheckUpdates={handleToggleAutoCheckUpdates}
+        appVersion={appVersion || __APP_VERSION__}
+        onOpenUpdates={() => setShowUpdateModal(true)}
+        hasUpdateAvailable={hasUpdateAvailable}
       />
     </div>
   );
