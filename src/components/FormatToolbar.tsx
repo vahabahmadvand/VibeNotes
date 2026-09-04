@@ -7,6 +7,8 @@ import {
   Strikethrough,
   Heading1,
   Heading2,
+  AlignLeft,
+  AlignRight,
   List,
   ListOrdered,
   CheckSquare,
@@ -62,6 +64,18 @@ export const FormatToolbar: React.FC<FormatToolbarProps> = ({ editor }) => {
       editor.chain().focus().setParagraph().run();
     } else {
       editor.chain().focus().toggleHeading({ level: 2 }).run();
+    }
+  };
+
+  const handleAlignLeft = () => {
+    editor.chain().focus().setTextAlign('left').run();
+  };
+
+  const handleAlignRight = () => {
+    if (editor.isActive({ textAlign: 'right' })) {
+      editor.chain().focus().setTextAlign('left').run();
+    } else {
+      editor.chain().focus().setTextAlign('right').run();
     }
   };
 
@@ -133,6 +147,29 @@ export const FormatToolbar: React.FC<FormatToolbarProps> = ({ editor }) => {
         title="Strikethrough"
       >
         <Strikethrough size={13} strokeWidth={2.5} />
+      </button>
+
+      <div
+        className="w-[1px] h-3.5 mx-0.5 opacity-30"
+        style={{ backgroundColor: 'var(--note-toolbar-icon)' }}
+      />
+
+      {/* Alignment */}
+      <button
+        onClick={handleAlignLeft}
+        className={btnClass}
+        style={getBtnStyle(editor.isActive({ textAlign: 'left' }))}
+        title="Align Left"
+      >
+        <AlignLeft size={13} strokeWidth={2.4} />
+      </button>
+      <button
+        onClick={handleAlignRight}
+        className={btnClass}
+        style={getBtnStyle(editor.isActive({ textAlign: 'right' }))}
+        title="Align Right"
+      >
+        <AlignRight size={13} strokeWidth={2.4} />
       </button>
 
       <div

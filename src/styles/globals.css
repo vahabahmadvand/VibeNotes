@@ -119,6 +119,11 @@
   height: 0;
 }
 
+.ProseMirror p[style*="text-align: right"].is-editor-empty:first-child::before,
+.ProseMirror p[style*="text-align:right"].is-editor-empty:first-child::before {
+  float: right;
+}
+
 .ProseMirror h1 {
   font-size: 1.35rem;
   font-weight: 700;
@@ -147,6 +152,14 @@
   margin-right: 0;
   font-style: italic;
   opacity: 0.9;
+}
+
+.ProseMirror blockquote[style*="text-align: right"],
+.ProseMirror blockquote[style*="text-align:right"] {
+  border-left: none;
+  border-right: 3px solid var(--note-border);
+  padding-left: 0;
+  padding-right: 0.75rem;
 }
 
 .ProseMirror hr {

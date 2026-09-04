@@ -12,6 +12,8 @@ import Underline from '@tiptap/extension-underline';
 import Placeholder from '@tiptap/extension-placeholder';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
+import TextAlign from '@tiptap/extension-text-align';
+import { TextSelection } from '@tiptap/pm/state';
 import { all, createLowlight } from 'lowlight';
 import { invoke } from '@tauri-apps/api/core';
 import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -105,6 +107,10 @@ export const StickyNote: React.FC<StickyNoteProps> = ({ noteId }) => {
         StarterKit.configure({
           codeBlock: false,
         }),
+        TextAlign.configure({
+          types: ['heading', 'paragraph', 'blockquote'],
+          defaultAlignment: 'left',
+        }),
         TaskList,
         TaskItem.configure({
           nested: true,
@@ -112,6 +118,73 @@ export const StickyNote: React.FC<StickyNoteProps> = ({ noteId }) => {
         CodeBlockLowlight.extend({
           addNodeView() {
             return ReactNodeViewRenderer(CodeBlockView);
+          },
+          addCommands() {
+            return {
+              ...this.parent?.(),
+              toggleCodeBlock: (attributes) => ({ state, tr, dispatch }) => {
+                const { schema, selection } = state;
+                const { from, to, $from, $to } = selection;
+                const codeBlockType = this.type;
+
+                // Check if selection intersects any codeBlock
+                const codeBlocks: { pos: number; node: any }[] = [];
+                state.doc.nodesBetween(from, to, (node, pos) => {
+                  if (node.type === codeBlockType) {
+                    codeBlocks.push({ pos, node });
+                    return false;
+                  }
+                });
+
+                if (codeBlocks.length > 0) {
+                  if (dispatch) {
+                    for (let i = codeBlocks.length - 1; i >= 0; i--) {
+                      const { pos, node } = codeBlocks[i];
+                      const text = node.textContent;
+                      const lines = text ? text.split('\n') : [''];
+                      const paragraphs = lines.map((line: string) =>
+                        schema.nodes.paragraph.create(null, line ? schema.text(line) : undefined)
+                      );
+                      tr.replaceWith(pos, pos + node.nodeSize, paragraphs);
+                    }
+                    dispatch(tr);
+                  }
+                  return true;
+                }
+
+                // Converting selection or current block to single codeBlock
+                let start: number, end: number;
+                let depth = Math.min($from.depth, $to.depth);
+                while (depth > 0 && $from.node(depth) !== $to.node(depth)) {
+                  depth--;
+                }
+                while (depth > 0) {
+                  const nodeType = $from.node(depth).type;
+                  const match = nodeType.contentMatch.matchType(codeBlockType);
+                  if (match) break;
+                  depth--;
+                }
+                start = $from.before(depth + 1);
+                end = $to.after(depth + 1);
+
+                const text = state.doc.textBetween(start, end, '\n');
+                const codeBlockNode = codeBlockType.create(
+                  attributes,
+                  text ? schema.text(text) : undefined
+                );
+
+                if (dispatch) {
+                  tr.replaceRangeWith(start, end, codeBlockNode);
+                  const selPos = Math.min(start + 1 + (text ? text.length : 0), tr.doc.content.size);
+                  tr.setSelection(TextSelection.create(tr.doc, selPos));
+                  dispatch(tr);
+                }
+                return true;
+              },
+              setCodeBlock: (attributes) => ({ commands }) => {
+                return commands.toggleCodeBlock(attributes);
+              },
+            };
           },
         }).configure({ lowlight }),
         Table.configure({
