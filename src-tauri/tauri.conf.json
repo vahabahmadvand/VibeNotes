@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "productName": "VibeNotes",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "identifier": "com.vibenotes.app",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -28,7 +28,9 @@
     ],
     "security": {
       "csp": null,
-      "capabilities": ["default"]
+      "capabilities": [
+        "default"
+      ]
     }
   },
   "bundle": {
