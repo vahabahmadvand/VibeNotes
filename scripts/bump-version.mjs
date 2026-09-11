@@ -113,6 +113,10 @@ console.log(`
 Next steps to release:
   git add .
   git commit -m "release: v${nextVersion}"
-  git tag v${nextVersion}
+  git tag -a v${nextVersion} -m "What's new in v${nextVersion}..."
   git push origin master --tags
+
+💡 Tip: The text you provide in git tag -m "..." will automatically become
+the release notes displayed in both GitHub Releases and the in-app updater!
+(If omitted, your recent commit titles are used automatically).
 `);

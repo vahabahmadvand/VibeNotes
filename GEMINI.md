@@ -56,12 +56,17 @@ cargo check --manifest-path src-tauri/Cargo.toml
 ```
 
 ### 5. Commit, Tag, and Push
+You can provide release notes directly in the git tag message using `-m`:
+
 ```bash
 git add .
 git commit -m "release: vX.Y.Z"
-git tag vX.Y.Z
+git tag -a vX.Y.Z -m "Release notes for vX.Y.Z..."
 git push origin master --tags
 ```
+
+> [!TIP]
+> Any message provided in `git tag -a vX.Y.Z -m "..."` will automatically be extracted by CI/CD and written into both the **GitHub Release** and **`latest.json`** (displayed inside the app's update dialog). If you omit the tag message, CI/CD will automatically collect all commit headlines since the previous tag as bullet points.
 
 ### 6. Automated GitHub Actions
 Pushing the `v*` tag triggers `.github/workflows/release.yml`, which:

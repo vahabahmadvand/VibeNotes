@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -54,6 +56,35 @@ jobs:
           "TAURI_SIGNING_PRIVATE_KEY=$cleanKey" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           "TAURI_SIGNING_PRIVATE_KEY_PATH=$keyPath" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
+      - name: Extract Release Notes
+        id: release_notes
+        shell: pwsh
+        run: |
+          # 1. Attempt to read annotated tag message
+          $tagMsg = (git tag -l --format="%(contents)" "${{ github.ref_name }}").Trim()
+
+          if ($tagMsg) {
+            $notes = $tagMsg
+          } else {
+            # 2. Fallback: collect commit messages since previous tag
+            $prevTag = git describe --tags --abbrev=0 "${{ github.ref_name }}^" 2>$null
+            if ($prevTag) {
+              $notes = git log "$prevTag..${{ github.ref_name }}" --pretty=format:"* %s"
+            } else {
+              $notes = git log -1 --pretty=format:"* %s"
+            }
+          }
+
+          if (-not $notes) {
+            $notes = "Maintenance and performance improvements."
+          }
+
+          Write-Host "Resolved Release Notes:"
+          Write-Host $notes
+
+          $delimiter = [System.Guid]::NewGuid().ToString()
+          "notes<<$delimiter`n$notes`n$delimiter" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
       - name: Build and Publish Tauri App
         uses: tauri-apps/tauri-action@v0
         env:
@@ -65,7 +96,7 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'VibeNotes ${{ github.ref_name }}'
-          generateReleaseNotes: true
+          releaseBody: ${{ steps.release_notes.outputs.notes }}
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
