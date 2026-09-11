@@ -1,6 +1,6 @@
 [package]
 name = "vibenotes"
-version = "0.4.0"
+version = "0.5.0"
 description = "VibeNotes - Lightweight Windows Sticky Notes with Markdown and Code Blocks"
 authors = ["VibeNotes Team"]
 edition = "2021"
@@ -26,6 +26,7 @@ env_logger = "0.11"
 regex = "1.10"
 tauri-plugin-updater = "2"
 tauri-plugin-process = "2"
+rfd = "0.15"
 
 [features]
 default = ["custom-protocol"]

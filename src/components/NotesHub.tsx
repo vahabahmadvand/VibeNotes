@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { getVersion } from '@tauri-apps/api/app';
 import { check } from '@tauri-apps/plugin-updater';
@@ -15,11 +15,14 @@ import {
   Eye,
   EyeOff,
   Settings,
+  Download,
+  CheckCircle2,
 } from 'lucide-react';
 import type { Note } from '../types';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { UpdateModal } from './UpdateModal';
 import { SettingsModal } from './SettingsModal';
+import { noteToMarkdown, sanitizeFileName } from '../utils/markdown';
 
 const COLOR_FILTERS: { id: string; name: string; bg: string }[] = [
   { id: 'all', name: 'All Colors', bg: '#94a3b8' },
@@ -49,6 +52,18 @@ export const NotesHub: React.FC = () => {
     return saved !== null ? saved === 'true' : true;
   });
   const [appVersion, setAppVersion] = useState<string>('');
+  const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showToast = (text: string, type: 'success' | 'error' = 'success') => {
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
+    setToastMessage({ text, type });
+    toastTimeoutRef.current = setTimeout(() => {
+      setToastMessage(null);
+    }, 3500);
+  };
 
   const handleToggleAutoCheckUpdates = () => {
     setAutoCheckUpdates((prev) => {
@@ -184,6 +199,42 @@ export const NotesHub: React.FC = () => {
       await fetchNotes();
     } catch (err) {
       console.error('Failed to delete note:', err);
+    }
+  };
+
+  const handleExportNote = async (note: Note) => {
+    try {
+      const markdownContent = noteToMarkdown(note);
+      const sanitizedTitle = sanitizeFileName(note.title || 'Untitled Note');
+      const defaultFilename = `${sanitizedTitle}.md`;
+
+      try {
+        const savedPath = await invoke<string | null>('export_note_to_markdown', {
+          defaultFilename,
+          content: markdownContent,
+        });
+
+        if (savedPath) {
+          const justFileName = savedPath.split(/[/\\]/).pop() || defaultFilename;
+          showToast(`Exported "${justFileName}" successfully`);
+        }
+      } catch (invokeErr) {
+        // Fallback for non-Tauri or dev environments
+        console.warn('Native export failed, falling back to browser download:', invokeErr);
+        const blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = defaultFilename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        showToast(`Exported "${defaultFilename}" successfully`);
+      }
+    } catch (err) {
+      console.error('Failed to export note:', err);
+      showToast('Failed to export note to Markdown', 'error');
     }
   };
 
@@ -410,10 +461,10 @@ export const NotesHub: React.FC = () => {
                 >
                   {/* Card Header */}
                   <div className="flex items-center justify-between gap-1 mb-1.5">
-                    <span className="font-semibold text-xs truncate max-w-[170px]">
+                    <span className="font-semibold text-xs truncate flex-1 min-w-0 pr-1">
                       {n.title || 'Untitled Note'}
                     </span>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -425,6 +476,16 @@ export const NotesHub: React.FC = () => {
                         title={n.is_pinned ? 'Unpin' : 'Pin to top'}
                       >
                         <Pin size={12} className={n.is_pinned ? 'fill-current' : ''} />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleExportNote(n);
+                        }}
+                        className="p-1 rounded hover:bg-black/10 transition-colors cursor-pointer"
+                        title="Export to Markdown (.md)"
+                      >
+                        <Download size={12} />
                       </button>
                       <button
                         onClick={(e) => {
@@ -515,6 +576,24 @@ export const NotesHub: React.FC = () => {
         onOpenUpdates={() => setShowUpdateModal(true)}
         hasUpdateAvailable={hasUpdateAvailable}
       />
+
+      {/* Toast Notification Banner */}
+      {toastMessage && (
+        <div
+          className={`fixed bottom-4 left-1/2 -translate-x-1/2 px-3.5 py-2 rounded-xl text-xs font-medium shadow-xl flex items-center gap-2 z-50 transition-all border ${
+            toastMessage.type === 'error'
+              ? 'bg-rose-950/90 text-rose-200 border-rose-800'
+              : 'bg-slate-900/90 text-slate-100 border-slate-700 dark:bg-white/95 dark:text-slate-900 dark:border-slate-200'
+          } backdrop-blur-md animate-in fade-in slide-in-from-bottom-2`}
+        >
+          {toastMessage.type === 'error' ? (
+            <X size={14} className="text-rose-400 shrink-0" />
+          ) : (
+            <CheckCircle2 size={14} className="text-emerald-400 dark:text-emerald-600 shrink-0" />
+          )}
+          <span className="truncate max-w-xs">{toastMessage.text}</span>
+        </div>
+      )}
     </div>
   );
 };

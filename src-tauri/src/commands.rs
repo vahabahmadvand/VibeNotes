@@ -276,3 +276,26 @@ pub async fn open_external_url(url: String) -> Result<(), String> {
     Ok(())
 }
 
+#[tauri::command]
+pub async fn export_note_to_markdown(
+    default_filename: String,
+    content: String,
+) -> Result<Option<String>, String> {
+    let file = rfd::AsyncFileDialog::new()
+        .set_title("Export Note as Markdown")
+        .set_file_name(&default_filename)
+        .add_filter("Markdown (*.md)", &["md"])
+        .add_filter("All Files (*.*)", &["*"])
+        .save_file()
+        .await;
+
+    if let Some(file_handle) = file {
+        let path = file_handle.path();
+        std::fs::write(path, content.as_bytes())
+            .map_err(|e| format!("Failed to write file: {}", e))?;
+        Ok(Some(path.to_string_lossy().to_string()))
+    } else {
+        Ok(None)
+    }
+}
+

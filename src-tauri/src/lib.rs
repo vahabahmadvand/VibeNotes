@@ -43,6 +43,7 @@ pub fn run() {
             commands::get_autostart_status,
             commands::toggle_autostart,
             commands::open_external_url,
+            commands::export_note_to_markdown,
         ])
         .setup(move |app| {
             let app_handle = app.handle().clone();

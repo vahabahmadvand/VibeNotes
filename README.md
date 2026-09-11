@@ -41,6 +41,7 @@ Check for GitHub releases, view changelogs, download signed updates, and restart
   - Interactive checklists with nested task lists (`Tab` / `Shift+Tab`).
   - Tables, blockquotes, links, and drag-and-drop image support.
 - 🗄️ **Central Notes Hub:** Search, filter by color, archive, or permanently delete notes, with a toggleable card size view (*Small, Medium, Large*).
+- 📤 **Markdown Export (.md):** Export any note directly from its thumbnail in the Notes Hub into a formatted Markdown file via a native Windows "Save As" dialog, preserving headings, checklists, code blocks, tables, images, and inline styles.
 - 🔄 **In-App Auto-Updates:** Seamless GitHub Releases integration with Tauri v2 updater. Checks for new releases, displays changelogs, validates cryptographic signatures, downloads in background, and relaunches smoothly.
 - 🔒 **Single Instance Protection:** Native Windows Kernel Mutex ensures only one instance runs at a time.
 - 🤖 **Model Context Protocol (MCP) Server:** Manage your sticky notes with any AI agent (Antigravity, Claude Desktop, Cursor, Claude Code, Cline) with full support for tables, code blocks, checklists, and themes!
@@ -203,9 +204,9 @@ npm run tauri build
 ```
 
 Once the build finishes:
-- **Standalone `.exe`**: `src-tauri/target/release/vibenotes.exe` (~12 MB)
-- **NSIS Setup Installer**: `src-tauri/target/release/bundle/nsis/VibeNotes_0.2.0_x64-setup.exe`
-- **MSI Installer**: `src-tauri/target/release/bundle/msi/VibeNotes_0.2.0_x64_en-US.msi`
+- **Standalone `.exe`**: `src-tauri/target/release/vibenotes.exe` (~18 MB)
+- **NSIS Setup Installer**: `src-tauri/target/release/bundle/nsis/VibeNotes_0.5.0_x64-setup.exe`
+- **MSI Installer**: `src-tauri/target/release/bundle/msi/VibeNotes_0.5.0_x64_en-US.msi`
 
 You can take `vibenotes.exe` and run it anywhere on Windows without installing anything!
 
@@ -229,6 +230,8 @@ VibeNotes/
 │   │   ├── FormatToolbar.tsx  # WYSIWYG markdown formatting bar
 │   │   ├── ThemePicker.tsx    # 7-color palette switcher
 │   │   └── DeleteConfirmModal.tsx # Delete confirmation dialog
+│   ├── utils/
+│   │   └── markdown.ts        # TipTap to Markdown converter & filename sanitizer
 │   ├── styles/
 │   │   └── globals.css        # Themes & custom CSS tokens
 │   ├── App.tsx                # Route switcher (#/note/:id vs #/hub)
